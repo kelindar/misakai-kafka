@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1343EB68-55CB-4452-8386-24A9989DE1C0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Misakai.Kafka</RootNamespace>
+    <AssemblyName>Misakai.Kafka</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Binary\BinaryStream.cs" />
+    <Compile Include="Binary\BinaryReader.cs" />
+    <Compile Include="Binary\BinaryHelper.cs" />
+    <Compile Include="Threading\ThreadWall.cs" />
+    <Compile Include="Default\DefaultKafkaConnectionFactory.cs" />
+    <Compile Include="Contracts\IMetadataQueries.cs" />
+    <Compile Include="Contracts\IKafkaTcpSocket.cs" />
+    <Compile Include="Broker\BrokerRoute.cs" />
+    <Compile Include="Threading\ScheduledTimer.cs" />
+    <Compile Include="Consumer.cs" />
+    <Compile Include="Contracts\IKafkaConnection.cs" />
+    <Compile Include="Broker\IBrokerRouter.cs" />
+    <Compile Include="MetadataQueries.cs" />
+    <Compile Include="ConsumerOptions.cs" />
+    <Compile Include="Default\DefaultPartitionSelector.cs" />
+    <Compile Include="Contracts\IKafkaLog.cs" />
+    <Compile Include="Contracts\IPartitionSelector.cs" />
+    <Compile Include="Broker\BrokerRouter.cs" />
+    <Compile Include="Network\KafkaEndpoint.cs" />
+    <Compile Include="KafkaMetadataProvider.cs" />
+    <Compile Include="Broker\Broker.cs" />
+    <Compile Include="Binary\BinaryCrc32.cs" />
+    <Compile Include="Contracts\IKafkaConnectionFactory.cs" />
+    <Compile Include="Producer.cs" />
+    <Compile Include="Network\KafkaConnection.cs" />
+    <Compile Include="KafkaOptions.cs" />
+    <Compile Include="Protocol\ConsumerMetadataRequest.cs" />
+    <Compile Include="Protocol\OffsetFetchRequest.cs" />
+    <Compile Include="Protocol\Protocol.cs" />
+    <Compile Include="Protocol\BaseRequest.cs" />
+    <Compile Include="Contracts\IKafkaRequest.cs" />
+    <Compile Include="Protocol\FetchRequest.cs" />
+    <Compile Include="Protocol\Message.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol\Topic.cs" />
+    <Compile Include="Protocol\MetadataRequest.cs" />
+    <Compile Include="Protocol\OffsetCommitRequest.cs" />
+    <Compile Include="Protocol\OffsetRequest.cs" />
+    <Compile Include="Protocol\ProduceRequest.cs" />
+    <Compile Include="Default\DefaultTraceLog.cs" />
+    <Compile Include="Network\KafkaTcpSocket.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
