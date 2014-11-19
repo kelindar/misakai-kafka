@@ -94,7 +94,7 @@ namespace Misakai.Kafka
             return request.Decode(response).ToList();
         }
 
-        #region Equals Override...
+        #region Equals Override
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -119,43 +119,43 @@ namespace Misakai.Kafka
             //This thread will poll the receive stream for data, parce a message out
             //and trigger an event with the message payload
             _connectionReadPollingTask = Task.Factory.StartNew(async () =>
+            {
+                try
                 {
-                    try
-                    {
-                        //only allow one reader to execute, dump out all other requests
-                        if (Interlocked.Increment(ref _ensureOneActiveReader) != 1) return;
+                    //only allow one reader to execute, dump out all other requests
+                    if (Interlocked.Increment(ref _ensureOneActiveReader) != 1) return;
                         
-                        while (_disposeToken.IsCancellationRequested == false)
+                    while (_disposeToken.IsCancellationRequested == false)
+                    {
+                        try
                         {
-                            try
+                            //_log.DebugFormat("Awaiting message from: {0}", _client.Endpoint);
+                            var messageSizeResult = await _client.ReadAsync(4, _disposeToken.Token);
+                            var messageSize = messageSizeResult.ToInt32();
+
+                            //_log.DebugFormat("Received message of size: {0} From: {1}", messageSize, _client.Endpoint);
+                            var message = await _client.ReadAsync(messageSize, _disposeToken.Token);
+
+                            CorrelatePayloadToRequest(message);
+                        }
+                        catch (Exception ex)
+                        { 
+                            //don't record the exception if we are disposing
+                            if (_disposeToken.IsCancellationRequested == false)
                             {
-                                //_log.DebugFormat("Awaiting message from: {0}", _client.Endpoint);
-                                var messageSizeResult = await _client.ReadAsync(4, _disposeToken.Token);
-                                var messageSize = messageSizeResult.ToInt32();
-
-                                //_log.DebugFormat("Received message of size: {0} From: {1}", messageSize, _client.Endpoint);
-                                var message = await _client.ReadAsync(messageSize, _disposeToken.Token);
-
-                                CorrelatePayloadToRequest(message);
-                            }
-                            catch (Exception ex)
-                            { 
-                                //don't record the exception if we are disposing
-                                if (_disposeToken.IsCancellationRequested == false)
-                                {
-                                    //TODO being in sync with the byte order on read is important.  What happens if this exception causes us to be out of sync?
-                                    //record exception and continue to scan for data.
-                                    _log.ErrorFormat("Exception occured in polling read thread.  Exception={0}", ex);
-                                }
+                                //TODO being in sync with the byte order on read is important.  What happens if this exception causes us to be out of sync?
+                                //record exception and continue to scan for data.
+                                _log.ErrorFormat("Exception occured in polling read thread.  Exception={0}", ex);
                             }
                         }
                     }
-                    finally
-                    {
-                        Interlocked.Decrement(ref _ensureOneActiveReader);
-                        _log.DebugFormat("Closed down connection to: {0}", _client.Endpoint);
-                    }   
-                }, TaskCreationOptions.LongRunning);
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref _ensureOneActiveReader);
+                    _log.DebugFormat("Closed down connection to: {0}", _client.Endpoint);
+                }   
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void CorrelatePayloadToRequest(byte[] payload)
@@ -175,10 +175,8 @@ namespace Misakai.Kafka
         private int NextCorrelationId()
         {
             var id = Interlocked.Increment(ref _correlationIdSeed);
-            if (id > int.MaxValue - 100) //somewhere close to max reset.
-            {
+            if (id > int.MaxValue - 1000)
                 Interlocked.Exchange(ref _correlationIdSeed, 0);
-            }
             return id;
         }
 
@@ -241,7 +239,7 @@ namespace Misakai.Kafka
             }
         }
 
-        #region Class AsyncRequestItem...
+        #region Class AsyncRequestItem
         class AsyncRequestItem
         {
             public AsyncRequestItem(int correlationId)

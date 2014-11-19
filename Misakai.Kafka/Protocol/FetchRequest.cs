@@ -34,7 +34,7 @@ namespace Misakai.Kafka
                 this.Fetches = new List<Fetch>();
 
             var topicGroups = this.Fetches
-                .GroupBy(x => x.Topic).ToList();
+                .GroupBy(x => x.Topic);
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
@@ -49,15 +49,15 @@ namespace Misakai.Kafka
             writer.Write(ReplicaId);
             writer.Write(this.MaxWaitTime);
             writer.Write(this.MinBytes);
-            writer.Write(topicGroups.Count);
+            writer.Write(topicGroups.Count());
 
             foreach (var topicGroup in topicGroups)
             {
                 var partitions = topicGroup
-                    .GroupBy(x => x.PartitionId).ToList();
+                    .GroupBy(x => x.PartitionId);
 
                 writer.Write(topicGroup.Key);
-                writer.Write(partitions.Count);
+                writer.Write(partitions.Count());
 
                 foreach (var partition in partitions)
                 {
@@ -81,7 +81,6 @@ namespace Misakai.Kafka
             var stream = new BinaryReader(data);
 
             var correlationId = stream.ReadInt32();
-
             var topicCount = stream.ReadInt32();
             for (int i = 0; i < topicCount; i++)
             {
