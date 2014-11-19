@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Misakai.Kafka;
 
@@ -39,7 +40,10 @@ namespace Misakai.Kafka
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, this);
+            writer.Write(this.ApiKey);
+            writer.Write(KafkaRequest.ApiVersion);
+            writer.Write(this.Correlation);
+            writer.Write(this.Client);
 
             // Write info
             writer.Write(ReplicaId);
@@ -94,10 +98,17 @@ namespace Misakai.Kafka
                         Error = stream.ReadInt16(),
                         HighWaterMark = stream.ReadInt64()
                     };
+
+                    var watch = Stopwatch.StartNew();
+
                     //note: dont use initializer here as it breaks stream position.
-                    response.Messages = Message.DecodeMessages(stream.ReadInt32Array())
-                        .Select(x => { x.Meta.PartitionId = partitionId; return x; })
+                    response.Messages = Message.DecodeMessages(stream.ReadInt32Array(), partitionId)
                         .ToList();
+
+                    watch.Stop();
+                    Console.WriteLine("Decoded {0} messages in {1} ms. ", response.Messages.Count, watch.Elapsed.TotalMilliseconds.ToString("N2"));
+
+
                     yield return response;
                 }
             }

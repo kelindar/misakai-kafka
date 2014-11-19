@@ -165,7 +165,7 @@ namespace Misakai.Kafka
                                         if (_disposeToken.IsCancellationRequested) return;
                                     }
 
-                                    var nextOffset = response.Messages.Max(x => x.Meta.Offset) + 1;
+                                    var nextOffset = response.Messages.Max(x => x.Offset) + 1;
                                     _partitionOffsetIndex.AddOrUpdate(partitionId, i => nextOffset, (i, l) => nextOffset);
 
                                     // sleep is not needed if responses were received

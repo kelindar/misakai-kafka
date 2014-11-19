@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Test
 {
@@ -28,7 +29,6 @@ namespace Test
                 var consumer = new Consumer(new ConsumerOptions("latencies", router));
                 foreach (var data in consumer.Consume())
                 {
-
                     var rtt = (DateTime.Now - new DateTime(
                         long.Parse(Encoding.UTF8.GetString(data.Value))
                         )).TotalMilliseconds;

@@ -55,7 +55,10 @@ namespace Misakai.Kafka
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, this);
+            writer.Write(this.ApiKey);
+            writer.Write(KafkaRequest.ApiVersion);
+            writer.Write(this.Correlation);
+            writer.Write(this.Client);
 
             // Encode the metadata now
             writer.Write(this.Acks);

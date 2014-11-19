@@ -13,12 +13,12 @@ namespace Misakai.Kafka
         /// <summary>
         /// Descriptive name used to identify the source of this request. 
         /// </summary>
-        string ClientId { get; set; }
+        string Client { get; set; }
 
         /// <summary>
         /// Id which will be echoed back by Kafka to correlate responses to this request.  Usually automatically assigned by driver.
         /// </summary>
-        int CorrelationId { get; set; }
+        int Correlation { get; set; }
 
         /// <summary>
         /// Enum identifying the specific type of request message being represented.

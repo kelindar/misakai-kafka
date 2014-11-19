@@ -29,7 +29,10 @@ namespace Misakai.Kafka
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, this);
+            writer.Write(this.ApiKey);
+            writer.Write(KafkaRequest.ApiVersion);
+            writer.Write(this.Correlation);
+            writer.Write(this.Client);
 
             // Write the consumer group
             writer.Write(ConsumerGroup);

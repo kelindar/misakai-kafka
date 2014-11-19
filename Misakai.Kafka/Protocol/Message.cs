@@ -11,14 +11,19 @@ namespace Misakai.Kafka
     /// <summary>
     /// Message represents the data from a single event occurance.
     /// </summary>
-    public struct Message
+    public sealed class Message
     {
         private const int MinimumMessageSize = 12;
 
         /// <summary>
-        /// Metadata on source offset and partition location for this message.
+        /// The log offset of this message as stored by the Kafka server.
         /// </summary>
-        public MessageMetadata Meta;
+        public long Offset;
+
+        /// <summary>
+        /// The partition id this offset is from.
+        /// </summary>
+        public int PartitionId;
 
         /// <summary>
         /// This is a version id used to allow backwards compatible evolution of the message binary format.  Reserved for future use.  
@@ -41,6 +46,14 @@ namespace Misakai.Kafka
         public byte[] Value;
 
         /// <summary>
+        /// Creates an empty message.
+        /// </summary>
+        public Message()
+        {
+
+        }
+
+        /// <summary>
         /// Convenience constructor will encode both the key and message to byte streams.
         /// Most of the time a message will be string based.
         /// </summary>
@@ -55,7 +68,8 @@ namespace Misakai.Kafka
             this.Value = value.ToBytes();
             this.Attribute = 0;
             this.MagicNumber = 0;
-            this.Meta = default(MessageMetadata);
+            this.Offset = 0;
+            this.PartitionId = 0;
         }
 
 
@@ -96,8 +110,9 @@ namespace Misakai.Kafka
         /// Decode a byte[] that represents a collection of messages.
         /// </summary>
         /// <param name="incoming">The byte[] encode as a message set from kafka.</param>
+        /// <param name="partition">The partition to decode the message for.</param>
         /// <returns>Enumerable representing stream of messages decoded from byte[]</returns>
-        public static IEnumerable<Message> DecodeMessages(byte[] incoming)
+        public static IEnumerable<Message> DecodeMessages(byte[] incoming, int partition)
         {
             var reader = new BinaryReader(incoming);
             while (reader.HasData)
@@ -125,10 +140,11 @@ namespace Misakai.Kafka
 
                 var message = new Message
                 {
-                    Meta = new MessageMetadata { Offset = offset },
+                    Offset = offset,
                     MagicNumber = reader.ReadByte(),
                     Attribute = reader.ReadByte(),
-                    Key = reader.ReadInt32Array()
+                    Key = reader.ReadInt32Array(),
+                    PartitionId = partition
                 };
 
                 // We don't support any codecs yet
@@ -138,6 +154,7 @@ namespace Misakai.Kafka
 
                 // Value is int32 prefixed byte-array
                 message.Value = reader.ReadInt32Array();
+                yield return message;
             }
         }
 
@@ -170,23 +187,5 @@ namespace Misakai.Kafka
     }
 
 
-    /// <summary>
-    /// Provides metadata about the message received from the FetchResponse
-    /// </summary>
-    /// <remarks>
-    /// The purpose of this metadata is to allow client applications to track their own offset information about messages received from Kafka.
-    /// <see cref="http://kafka.apache.org/documentation.html#semantics"/>
-    /// </remarks>
-    public struct MessageMetadata
-    {
-        /// <summary>
-        /// The log offset of this message as stored by the Kafka server.
-        /// </summary>
-        public long Offset;
 
-        /// <summary>
-        /// The partition id this offset is from.
-        /// </summary>
-        public int PartitionId;
-    }
 }

@@ -75,11 +75,11 @@ namespace Misakai.Kafka
         public async Task<List<T>> SendAsync<T>(IKafkaRequest<T> request)
         {
             //assign unique correlationId
-            request.CorrelationId = NextCorrelationId();
+            request.Correlation = NextCorrelationId();
 
-            var asyncRequest = new AsyncRequestItem(request.CorrelationId);
+            var asyncRequest = new AsyncRequestItem(request.Correlation);
 
-            if (_requestIndex.TryAdd(request.CorrelationId, asyncRequest) == false)
+            if (_requestIndex.TryAdd(request.Correlation, asyncRequest) == false)
                 throw new ApplicationException("Failed to register request for async response.");
 
             // Encode the request into a stream
