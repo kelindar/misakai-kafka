@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Misakai.Kafka
 {
-    public class MetadataRequest : KafkaRequest, IKafkaRequest<MetadataResponse>
+    public sealed class MetadataRequest : KafkaRequest, IKafkaRequest<MetadataResponse>
     {
         /// <summary>
         /// Indicates the type of kafka encoding this request is
@@ -15,38 +15,26 @@ namespace Misakai.Kafka
         /// </summary>
         public List<string> Topics { get; set; }
 
-        public void Encode(BinaryStream writer)
-        {
-            EncodeMetadataRequest(writer, this);
-        }
-
-        public IEnumerable<MetadataResponse> Decode(byte[] payload)
-        {
-            return new[] { DecodeMetadataResponse(payload) };
-        }
-
         /// <summary>
         /// Encode a request for metadata about topic and broker information.
         /// </summary>
-        /// <param name="request">The MetaDataRequest to encode.</param>
-        /// <returns>Encoded byte[] representing the request.</returns>
         /// <remarks>Format: (MessageSize), Header, ix(hs)</remarks>
-        private void EncodeMetadataRequest(BinaryStream writer, MetadataRequest request)
+        public void Encode(BinaryStream writer)
         {
-            if (request.Topics == null)
-                request.Topics = new List<string>();
+            if (this.Topics == null)
+                this.Topics = new List<string>();
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Write the number of topics 
-            writer.Write(request.Topics.Count);
+            writer.Write(this.Topics.Count);
 
             // Write each topic
-            foreach(var topic in request.Topics)
+            foreach (var topic in this.Topics)
             {
                 writer.Write(topic);
             }
@@ -58,9 +46,7 @@ namespace Misakai.Kafka
         /// <summary>
         /// Decode the metadata response from kafka server.
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private MetadataResponse DecodeMetadataResponse(byte[] data)
+        public IEnumerable<MetadataResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
             var response = new MetadataResponse();
@@ -78,8 +64,10 @@ namespace Misakai.Kafka
                 response.Topics.Add(Topic.FromStream(stream));
             }
 
-            return response;
+            yield return response;
         }
+
+
 
     }
 

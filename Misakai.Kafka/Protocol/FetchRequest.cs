@@ -5,7 +5,7 @@ using Misakai.Kafka;
 
 namespace Misakai.Kafka
 {
-    public class FetchRequest : KafkaRequest, IKafkaRequest<FetchResponse>
+    public sealed class FetchRequest : KafkaRequest, IKafkaRequest<FetchResponse>
     {
         internal const int DefaultMinBlockingByteBufferSize = 4096;
         private const int DefaultMaxBlockingWaitTime = 10;
@@ -14,10 +14,12 @@ namespace Misakai.Kafka
         /// Indicates the type of kafka encoding this request is
         /// </summary>
         public ApiKeyRequestType ApiKey { get { return ApiKeyRequestType.Fetch; } }
+
         /// <summary>
         /// The maximum amount of time to block for the MinBytes to be available before returning.
         /// </summary>
         public int MaxWaitTime = DefaultMaxBlockingWaitTime;
+
         /// <summary>
         /// Defines how many bytes should be available before returning data. A value of 0 indicate a no blocking command.
         /// </summary>
@@ -27,32 +29,22 @@ namespace Misakai.Kafka
 
         public void Encode(BinaryStream writer)
         {
-            EncodeFetchRequest(writer, this);
-        }
+            if (this.Fetches == null)
+                this.Fetches = new List<Fetch>();
 
-        public IEnumerable<FetchResponse> Decode(byte[] payload)
-        {
-            return DecodeFetchResponse(payload);
-        }
-
-        private void EncodeFetchRequest(BinaryStream writer, FetchRequest request)
-        {
-            if (request.Fetches == null) 
-                request.Fetches = new List<Fetch>();
-
-            var topicGroups = request.Fetches
+            var topicGroups = this.Fetches
                 .GroupBy(x => x.Topic).ToList();
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Write info
             writer.Write(ReplicaId);
-            writer.Write(request.MaxWaitTime);
-            writer.Write(request.MinBytes);
+            writer.Write(this.MaxWaitTime);
+            writer.Write(this.MinBytes);
             writer.Write(topicGroups.Count);
 
             foreach (var topicGroup in topicGroups)
@@ -76,9 +68,11 @@ namespace Misakai.Kafka
 
             // Write the length at the placeholder
             writer.WriteLengthAt(placeholder);
+
+
         }
 
-        private IEnumerable<FetchResponse> DecodeFetchResponse(byte[] data)
+        public IEnumerable<FetchResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
 
@@ -108,6 +102,8 @@ namespace Misakai.Kafka
                 }
             }
         }
+
+
     }
 
     public class Fetch
@@ -121,14 +117,17 @@ namespace Misakai.Kafka
         /// The name of the topic.
         /// </summary>
         public string Topic { get; set; }
+
         /// <summary>
         /// The id of the partition the fetch is for.
         /// </summary>
         public int PartitionId { get; set; }
+
         /// <summary>
         /// The offset to begin this fetch from.
         /// </summary>
         public long Offset { get; set; }
+
         /// <summary>
         /// The maximum bytes to include in the message set for this partition. This helps bound the size of the response.
         /// </summary>
@@ -141,14 +140,17 @@ namespace Misakai.Kafka
         /// The name of the topic this response entry is for.
         /// </summary>
         public string Topic { get; set; }
+
         /// <summary>
         /// The id of the partition this response is for.
         /// </summary>
         public int PartitionId { get; set; }
+
         /// <summary>
         /// Error code of exception that occured during the request.  Zero if no error.
         /// </summary>
         public Int16 Error { get; set; }
+
         /// <summary>
         /// The offset at the end of the log for this partition. This can be used by the client to determine how many messages behind the end of the log they are.
         /// </summary>

@@ -11,7 +11,7 @@ namespace Misakai.Kafka
     /// for a given consumer group.  Essentially this part of the api allows a user to save/load a given offset position
     /// under any abritrary name.
     /// </summary>
-    public class OffsetFetchRequest : KafkaRequest, IKafkaRequest<OffsetFetchResponse>
+    public sealed class OffsetFetchRequest : KafkaRequest, IKafkaRequest<OffsetFetchResponse>
     {
         public ApiKeyRequestType ApiKey { get { return ApiKeyRequestType.OffsetFetch; } }
         public string ConsumerGroup { get; set; }
@@ -19,22 +19,17 @@ namespace Misakai.Kafka
 
         public void Encode(BinaryStream writer)
         {
-            EncodeOffsetFetchRequest(writer, this);
-        }
+            if (this.Topics == null)
+                this.Topics = new List<OffsetFetch>();
 
-        protected void EncodeOffsetFetchRequest(BinaryStream writer, OffsetFetchRequest request)
-        {
-            if (request.Topics == null)
-                request.Topics = new List<OffsetFetch>();
-
-            var topicGroups = request.Topics
+            var topicGroups = this.Topics
                 .GroupBy(x => x.Topic).ToList();
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Write the consumer group
             writer.Write(ConsumerGroup);
@@ -61,13 +56,8 @@ namespace Misakai.Kafka
             writer.WriteLengthAt(placeholder);
         }
 
-        public IEnumerable<OffsetFetchResponse> Decode(byte[] payload)
-        {
-            return DecodeOffsetFetchResponse(payload);
-        }
 
-
-        protected IEnumerable<OffsetFetchResponse> DecodeOffsetFetchResponse(byte[] data)
+        public IEnumerable<OffsetFetchResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
             var correlationId = stream.ReadInt32();
@@ -88,10 +78,12 @@ namespace Misakai.Kafka
                         MetaData = stream.ReadInt16String(),
                         Error = stream.ReadInt16()
                     };
+
                     yield return response;
                 }
             }
         }
+
 
     }
 

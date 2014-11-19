@@ -5,37 +5,6 @@ using System.Text;
 
 namespace Misakai.Kafka
 {
-    public static class Compression
-    {
-        public static byte[] Zip(byte[] bytes)
-        {
-            using (var source = new MemoryStream(bytes))
-            using (var destination = new MemoryStream())
-            {
-                using (var gzip = new GZipStream(destination, CompressionMode.Compress, false))
-                {
-                    source.CopyTo(gzip);
-                }
-
-                return destination.ToArray();
-            }
-        }
-
-        public static byte[] Unzip(byte[] bytes)
-        {
-            using (var source = new MemoryStream(bytes))
-            using (var destination = new MemoryStream())
-            {
-                using (var gzip = new GZipStream(source, CompressionMode.Decompress, false))
-                {
-                    gzip.CopyTo(destination);
-                }
-
-                return destination.ToArray();
-            }
-        }
-    }
-
     public enum ApiKeyRequestType
     {
         Produce = 0,
@@ -82,7 +51,6 @@ namespace Misakai.Kafka
         CodecSnappy = 0x02
     }
 
-    #region Exceptions...
     public class FailCrcCheckException : Exception
     {
         public FailCrcCheckException(string message, params object[] args) : base(string.Format(message, args)) { }
@@ -126,7 +94,4 @@ namespace Misakai.Kafka
     {
         public UnresolvedHostnameException(string message, params object[] args) : base(string.Format(message, args)) { }
     }
-    #endregion
-
-
 }

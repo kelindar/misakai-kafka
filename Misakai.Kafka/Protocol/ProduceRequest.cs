@@ -7,7 +7,7 @@ using Misakai.Kafka;
 
 namespace Misakai.Kafka
 {
-    public class ProduceRequest : KafkaRequest, IKafkaRequest<ProduceResponse>
+    public sealed class ProduceRequest : KafkaRequest, IKafkaRequest<ProduceResponse>
     {
         private Func<MessageCodec, byte[], byte[]> compressionFunction;
 
@@ -39,23 +39,10 @@ namespace Misakai.Kafka
 
         public void Encode(BinaryStream writer)
         {
-            EncodeProduceRequest(writer, this);
-        }
+            if (this.Payload == null)
+                this.Payload = new List<Payload>();
 
-
-
-        public IEnumerable<ProduceResponse> Decode(byte[] payload)
-        {
-            return DecodeProduceResponse(payload);
-        }
-
-        #region Protocol...
-        private void EncodeProduceRequest(BinaryStream writer, ProduceRequest request)
-        {
-            if (request.Payload == null) 
-                request.Payload = new List<Payload>();
-
-            var groupedPayloads = (from p in request.Payload
+            var groupedPayloads = (from p in this.Payload
                                    group p by new
                                    {
                                        p.Topic,
@@ -68,14 +55,14 @@ namespace Misakai.Kafka
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Encode the metadata now
-            writer.Write(request.Acks);
-            writer.Write(request.TimeoutMS);
+            writer.Write(this.Acks);
+            writer.Write(this.TimeoutMS);
             writer.Write(groupedPayloads.Count);
 
-            
+
             foreach (var groupedPayload in groupedPayloads)
             {
                 var payloads = groupedPayload.ToList();
@@ -88,7 +75,7 @@ namespace Misakai.Kafka
                 writer.Write(groupedPayload.Key.Topic);
                 writer.Write(payloads.Count);
                 writer.Write(groupedPayload.Key.Partition);
-                
+
                 // Placeholder for the length
                 var length = writer.PutPlaceholder();
 
@@ -104,7 +91,9 @@ namespace Misakai.Kafka
             writer.WriteLengthAt(placeholder);
         }
 
-        private IEnumerable<ProduceResponse> DecodeProduceResponse(byte[] data)
+
+
+        public IEnumerable<ProduceResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
 
@@ -130,7 +119,7 @@ namespace Misakai.Kafka
                 }
             }
         }
-        #endregion
+
     }
 
     public class ProduceResponse

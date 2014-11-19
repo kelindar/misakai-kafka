@@ -72,7 +72,7 @@
     <Compile Include="Protocol\ConsumerMetadataRequest.cs" />
     <Compile Include="Protocol\OffsetFetchRequest.cs" />
     <Compile Include="Protocol\Protocol.cs" />
-    <Compile Include="Protocol\BaseRequest.cs" />
+    <Compile Include="Protocol\KafkaRequest.cs" />
     <Compile Include="Contracts\IKafkaRequest.cs" />
     <Compile Include="Protocol\FetchRequest.cs" />
     <Compile Include="Protocol\Message.cs" />

@@ -59,7 +59,8 @@ namespace Misakai.Kafka
         public async Task<List<ProduceResponse>> SendMessageAsync(string topic, IEnumerable<Message> messages, Int16 acks = 1,
             TimeSpan? timeout = null, MessageCodec codec = MessageCodec.CodecNone)
         {
-            if (timeout == null) timeout = TimeSpan.FromMilliseconds(DefaultTimeoutMS);
+            if (timeout == null) 
+                timeout = TimeSpan.FromMilliseconds(DefaultTimeoutMS);
 
             try
             {
@@ -75,20 +76,20 @@ namespace Misakai.Kafka
                 foreach (var route in routeGroup)
                 {
                     var request = new ProduceRequest
+                    {
+                        Acks = acks,
+                        TimeoutMS = (int)timeout.Value.TotalMilliseconds,
+                        Payload = new List<Payload>
                         {
-                            Acks = acks,
-                            TimeoutMS = (int)timeout.Value.TotalMilliseconds,
-                            Payload = new List<Payload>
-                                {
-                                    new Payload
-                                        {
-                                            Codec = codec,
-                                            Topic = route.Key.Topic,
-                                            Partition = route.Key.PartitionId,
-                                            Messages = route.Select(x => x.Message).ToList()
-                                        }
-                                }
-                        };
+                            new Payload
+                            {
+                                Codec = codec,
+                                Topic = route.Key.Topic,
+                                Partition = route.Key.PartitionId,
+                                Messages = route.Select(x => x.Message).ToList()
+                            }
+                        }
+                    };
 
                     sendTasks.Add(route.Key.Connection.SendAsync(request));
                 }

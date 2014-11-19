@@ -148,9 +148,24 @@ namespace Misakai.Kafka
     /// </summary>
     public struct Payload
     {
+        /// <summary>
+        /// The topic that the payload belongs to.
+        /// </summary>
         public string Topic;
+
+        /// <summary>
+        /// The partition of the payload.
+        /// </summary>
         public int Partition;
+
+        /// <summary>
+        /// The encoding of the payload.
+        /// </summary>
         public MessageCodec Codec;
+
+        /// <summary>
+        /// The payload itself.
+        /// </summary>
         public List<Message> Messages;
     }
 

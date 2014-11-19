@@ -8,34 +8,24 @@ namespace Misakai.Kafka
 	/// <summary>
 	/// A funky Protocol for requesting the starting offset of each segment for the requested partition 
 	/// </summary>
-    public class OffsetRequest : KafkaRequest, IKafkaRequest<OffsetResponse>
+    public sealed class OffsetRequest : KafkaRequest, IKafkaRequest<OffsetResponse>
     {
         public ApiKeyRequestType ApiKey { get { return ApiKeyRequestType.Offset; } }
         public List<Offset> Offsets { get; set; }
 
         public void Encode(BinaryStream writer)
         {
-            EncodeOffsetRequest(writer, this);
-        }
+            if (this.Offsets == null)
+                this.Offsets = new List<Offset>();
 
-        public IEnumerable<OffsetResponse> Decode(byte[] payload)
-        {
-            return DecodeOffsetResponse(payload);
-        }
-
-        private void EncodeOffsetRequest(BinaryStream writer, OffsetRequest request)
-        {
-            if (request.Offsets == null) 
-                request.Offsets = new List<Offset>();
-
-            var topicGroups = request.Offsets
+            var topicGroups = this.Offsets
                 .GroupBy(x => x.Topic).ToList();
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Encode the metadata now
             writer.Write(ReplicaId);
@@ -66,7 +56,7 @@ namespace Misakai.Kafka
             writer.WriteLengthAt(placeholder);
         }
 
-        private IEnumerable<OffsetResponse> DecodeOffsetResponse(byte[] data)
+        public IEnumerable<OffsetResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
 
@@ -97,6 +87,7 @@ namespace Misakai.Kafka
                 }
             }
         }
+
     }
 
     public class Offset

@@ -9,7 +9,7 @@ namespace Misakai.Kafka
     /// Class that represents the api call to commit a specific set of offsets for a given topic.  The offset is saved under the 
     /// arbitrary ConsumerGroup name provided by the call.
     /// </summary>
-    public class OffsetCommitRequest : KafkaRequest, IKafkaRequest<OffsetCommitResponse>
+    public sealed class OffsetCommitRequest : KafkaRequest, IKafkaRequest<OffsetCommitResponse>
     {
         public ApiKeyRequestType ApiKey { get { return ApiKeyRequestType.OffsetCommit; } }
         public string ConsumerGroup { get; set; }
@@ -17,30 +17,20 @@ namespace Misakai.Kafka
 
         public void Encode(BinaryStream writer)
         {
-            EncodeOffsetCommitRequest(writer, this);
-        }
+            if (this.OffsetCommits == null)
+                this.OffsetCommits = new List<OffsetCommit>();
 
-        public IEnumerable<OffsetCommitResponse> Decode(byte[] payload)
-        {
-            return DecodeOffsetCommitResponse(payload);
-        }
-
-        private void EncodeOffsetCommitRequest(BinaryStream writer, OffsetCommitRequest request)
-        {
-            if (request.OffsetCommits == null) 
-                request.OffsetCommits = new List<OffsetCommit>();
-
-            var topicGroups = request.OffsetCommits
+            var topicGroups = this.OffsetCommits
                 .GroupBy(x => x.Topic).ToList();
 
             // Here we put a placeholder for the length
             var placeholder = writer.PutPlaceholder();
 
             // Encode the header first
-            EncodeHeader(writer, request);
+            EncodeHeader(writer, this);
 
             // Write topic groups
-            writer.Write(request.ConsumerGroup);
+            writer.Write(this.ConsumerGroup);
             writer.Write(topicGroups.Count);
 
             foreach (var topicGroup in topicGroups)
@@ -70,12 +60,11 @@ namespace Misakai.Kafka
             writer.WriteLengthAt(placeholder);
         }
 
-        private IEnumerable<OffsetCommitResponse> DecodeOffsetCommitResponse(byte[] data)
+        public IEnumerable<OffsetCommitResponse> Decode(byte[] data)
         {
             var stream = new BinaryReader(data);
 
             var correlationId = stream.ReadInt32();
-
             var topicCount = stream.ReadInt32();
             for (int i = 0; i < topicCount; i++)
             {
@@ -95,6 +84,8 @@ namespace Misakai.Kafka
                 }
             }
         }
+
+
     }
 
     public class OffsetCommit
@@ -103,18 +94,22 @@ namespace Misakai.Kafka
         /// The topic the offset came from.
         /// </summary>
         public string Topic { get; set; }
+
         /// <summary>
         /// The partition the offset came from.
         /// </summary>
         public int PartitionId { get; set; }
+
         /// <summary>
         /// The offset number to commit as completed.
         /// </summary>
         public long Offset { get; set; }
+
         /// <summary>
         /// If the time stamp field is set to -1, then the broker sets the time stamp to the receive time before committing the offset.
         /// </summary>
         public long TimeStamp { get; set; }
+
         /// <summary>
         /// Descriptive metadata about this commit.
         /// </summary>
