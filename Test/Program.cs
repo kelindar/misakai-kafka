@@ -21,26 +21,37 @@ namespace Test
             };
             var router = new BrokerRouter(options);
             var client = new Producer(router);
-            var queue = new RollingQueue<double>(50);
+            var timing = new RollingQueue<double>(50);
+            var rate = new RollingQueue<double>(50);
             var second = DateTime.Now.Second;
+            var count = 0;
             
+
             Task.Run(() =>
             {
                 var consumer = new Consumer(new ConsumerOptions("latencies", router));
                 foreach (var data in consumer.Consume())
                 {
+                    count++;
                     var rtt = (DateTime.Now - new DateTime(
                         long.Parse(Encoding.UTF8.GetString(data.Value))
                         )).TotalMilliseconds;
+
                     if (rtt < 1000)
+                        timing.Enqueue(rtt);
+
+                    if (second != DateTime.Now.Second)
                     {
-                        queue.Enqueue(rtt);
-                        if (second != DateTime.Now.Second)
-                        {
-                            second = DateTime.Now.Second;
-                            Console.WriteLine(queue.Average() + " ms.");
-                        }
+                        second = DateTime.Now.Second;
+                        rate.Enqueue(count);
+                        count = 0;
+                        Console.WriteLine("Rate: {0} pps.\t{1} ", 
+                            rate.Average().ToString("N2") , (rtt < 1000) 
+                            ? "RTT: " + timing.Average().ToString("N2") + " ms."
+                            : string.Empty
+                        );
                     }
+                    
                 }
             });
 

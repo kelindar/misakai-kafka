@@ -99,18 +99,11 @@ namespace Misakai.Kafka
                         HighWaterMark = stream.ReadInt64()
                     };
 
-                    var watch = Stopwatch.StartNew();
-
                     // The length of the message payload
                     var length = stream.ReadInt32();
                     response.Messages = Message.DecodeMessages(data, stream.Position, length, partitionId)
                         .ToList();
                     stream.Position += length;
-
-                    watch.Stop();
-                    Console.WriteLine("Decoded {0} messages in {1} ms. ", response.Messages.Count, watch.Elapsed.TotalMilliseconds.ToString("N4"));
-
-
                     yield return response;
                 }
             }
