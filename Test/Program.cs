@@ -14,7 +14,7 @@ namespace Test
         static void Main(string[] args)
         {
 
-            var options = new KafkaOptions(new Uri("http://m1.emitter.io:9092"), new Uri("http://m1.emitter.io:9092"))
+            var options = new KafkaOptions(new Uri("http://SERVER1:9092"), new Uri("http://SERVER2:9092"))
                 {
                     Log = new ConsoleLog()
                 };
@@ -52,11 +52,8 @@ namespace Test
                 Thread.Sleep(1);
             }
 
-            using (client)
-            using (router)
-            {
-
-            }
+            client.Dispose();
+            router.Dispose();
         }
     }
 }
