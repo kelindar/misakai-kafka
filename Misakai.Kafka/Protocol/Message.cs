@@ -112,9 +112,9 @@ namespace Misakai.Kafka
         /// <param name="incoming">The byte[] encode as a message set from kafka.</param>
         /// <param name="partition">The partition to decode the message for.</param>
         /// <returns>Enumerable representing stream of messages decoded from byte[]</returns>
-        public static IEnumerable<Message> DecodeMessages(byte[] incoming, int partition)
+        public static IEnumerable<Message> DecodeMessages(byte[] incoming, int readOffset, int readSize, int partition)
         {
-            var reader = new BinaryReader(incoming);
+            var reader = new BinaryReader(incoming, readOffset, readSize);
             while (reader.HasData)
             {
                 // If the message set hits against our max bytes wall on the fetch we will have a 

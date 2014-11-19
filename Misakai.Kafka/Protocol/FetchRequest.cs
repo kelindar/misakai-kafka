@@ -101,12 +101,14 @@ namespace Misakai.Kafka
 
                     var watch = Stopwatch.StartNew();
 
-                    //note: dont use initializer here as it breaks stream position.
-                    response.Messages = Message.DecodeMessages(stream.ReadInt32Array(), partitionId)
+                    // The length of the message payload
+                    var length = stream.ReadInt32();
+                    response.Messages = Message.DecodeMessages(data, stream.Position, length, partitionId)
                         .ToList();
+                    stream.Position += length;
 
                     watch.Stop();
-                    Console.WriteLine("Decoded {0} messages in {1} ms. ", response.Messages.Count, watch.Elapsed.TotalMilliseconds.ToString("N2"));
+                    Console.WriteLine("Decoded {0} messages in {1} ms. ", response.Messages.Count, watch.Elapsed.TotalMilliseconds.ToString("N4"));
 
 
                     yield return response;

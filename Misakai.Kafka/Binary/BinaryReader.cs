@@ -46,7 +46,8 @@ namespace Misakai.Kafka
         /// </summary>
         public int Position
         {
-            get { return Index; } 
+            get { return Index; }
+            set { Index = value; }
         }
 
         /// <summary>
