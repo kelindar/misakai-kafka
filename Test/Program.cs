@@ -30,6 +30,14 @@ namespace Test
             Task.Run(() =>
             {
                 var consumer = new Consumer(new ConsumerOptions("latencies", router));
+                var position = consumer.GetTopicOffsetAsync("latencies");
+                position.Wait();
+                consumer.SetOffsetPosition(
+                    position.Result
+                        .Select(p => new OffsetPosition(p.PartitionId, p.Offsets.First()))
+                        .ToArray()
+                    );
+
                 foreach (var data in consumer.Consume())
                 {
                     count++;

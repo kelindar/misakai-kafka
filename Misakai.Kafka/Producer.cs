@@ -13,7 +13,7 @@ namespace Misakai.Kafka
     /// </summary>
     public class Producer : IMetadataQueries
     {
-        private const int DefaultTimeoutMS = 10;
+        private const int DefaultTimeoutMS = 100;
 
         private readonly IBrokerRouter _router;
         private readonly SemaphoreSlim _sendSemaphore;
