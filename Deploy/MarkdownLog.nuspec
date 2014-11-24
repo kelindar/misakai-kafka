@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Misakai.Kafka</id>
+    <version>$version$</version>
+    <authors>Roman Atachiants <roman@misakai.com></authors>
+    <licenseUrl>https://github.com/Kelindar/misakai-kafka/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Kelindar/misakai-kafka</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Misakai.Kafka is a high performance Apache Kafka client for C#.</description>
+    <copyright>Copyright 2014 Misakai Ltd</copyright>
+    <tags>apache kafka .net distributed pubsub messaging</tags>
+  </metadata>
+  <files>
+    <file src="..\Misakai.Kafka\bin\Release\Misakai.Kafka.dll" target="lib" />
+  </files>
+</package>
