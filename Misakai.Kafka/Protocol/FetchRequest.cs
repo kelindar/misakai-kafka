@@ -9,7 +9,7 @@ namespace Misakai.Kafka
     public sealed class FetchRequest : KafkaRequest, IKafkaRequest<FetchResponse>
     {
         internal const int DefaultMinBlockingByteBufferSize = 4096;
-        private const int DefaultMaxBlockingWaitTime = 10;
+        private const int DefaultMaxBlockingWaitTime = 0;
 
         /// <summary>
         /// Indicates the type of kafka encoding this request is

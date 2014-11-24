@@ -67,7 +67,18 @@ namespace Test
 
             while (true)
             {
-                client.SendMessageAsync("latencies", new[] { new Message(DateTime.Now.Ticks.ToString()) });
+                client.SendMessageAsync("latencies", new[] {
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString()),
+                    new Message(DateTime.Now.Ticks.ToString())
+                }, 1);
                 Thread.Sleep(1);
             }
 
