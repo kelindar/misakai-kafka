@@ -7,6 +7,6 @@ Write-Host "Setting .nuspec version tag to $versionStr"
 $content = (Get-Content $root\Deploy\Misakai.Kafka.nuspec) 
 $content = $content -replace '\$version\$',$versionStr
 
-$content | Out-File $root\nuget\Misakai.Kafka.compiled.nuspec
+$content | Out-File $root\Deploy\Misakai.Kafka.compiled.nuspec
 
-& $root\Deploy\NuGet.exe pack $root\nuget\Misakai.Kafka.compiled.nuspec
+& $root\Deploy\NuGet.exe pack $root\Deploy\Misakai.Kafka.compiled.nuspec
