@@ -3,7 +3,7 @@
   <metadata>
     <id>Misakai.Kafka</id>
     <version>$version$</version>
-    <authors>Roman Atachiants <roman@misakai.com></authors>
+    <authors>Roman Atachiants</authors>
     <licenseUrl>https://github.com/Kelindar/misakai-kafka/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Kelindar/misakai-kafka</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
