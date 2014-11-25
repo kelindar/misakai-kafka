@@ -4,7 +4,7 @@ Misakai.Kafka
 High-Performance C# client for Apache Kafka. This client was designed not to support all possibile features, but to serve as a minimalistic and lightweight Kafka client for long-running producers/consumers. The code was based on James Roland's KafkaNet implementation, trimmed down and optimized significantly.
 
 * Build Status: [![Build status](https://ci.appveyor.com/api/projects/status/5yra8edemc5kji46?svg=true)](https://ci.appveyor.com/project/Kelindar/misakai-kafka)
-* NuGet Package: "Misakai.Kafka"
+* NuGet Package: [Misakai.Kafka](https://www.nuget.org/packages/Misakai.Kafka/)
 
 Examples
 -----------
