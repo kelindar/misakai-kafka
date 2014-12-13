@@ -22,10 +22,13 @@ after_test:
 artifacts:
   - path: Misakai.Kafka\bin\Release\Misakai.Kafka.dll
     name: Misakai.Kafka.dll
-  - path: '**\*.nupkg'
 
 deploy:
   provider: NuGet
   api_key:
     secure: rU+w5deWOMiUmQES2u4bz1o0ElWYIfjxKVokp+QUjjidbGiRJwK6s1LcTNRrAde3
   artifact: /.*\.nupkg/
+
+nuget:
+  account_feed: false
+  project_feed: false
