@@ -5,7 +5,7 @@
     <version>$version$</version>
     <authors>Roman Atachiants</authors>
     <projectUrl>https://github.com/Kelindar/misakai-kafka</projectUrl>
-    <iconUrl>http://s3.amazonaws.com/cdn.misakai.com/www-nuget/misakai.png</iconUrl>
+    <iconUrl>http://s3.amazonaws.com/cdn.misakai.com/www-nuget/kafka.png</iconUrl>
     <licenseUrl>https://github.com/Kelindar/misakai-kafka/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Misakai.Kafka is a high performance Apache Kafka client for C#.</description>
